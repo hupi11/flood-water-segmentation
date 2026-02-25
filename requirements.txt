@@ -1,0 +1,13 @@
+torch>=1.10.0
+torchvision>=0.11.0
+numpy
+opencv-python
+Pillow
+matplotlib
+tqdm
+scikit-learn
+scipy
+scikit-posthocs
+pandas
+seaborn
+timm

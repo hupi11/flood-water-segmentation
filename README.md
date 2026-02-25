@@ -44,16 +44,43 @@ flood_data/
 
 ## Requirements
 
+### Installation
+
+Clone this repository and create a conda environment:
+
 ```bash
-pip install torch torchvision opencv-python scikit-learn scipy scikit-posthocs pandas matplotlib seaborn pillow tqdm
+git clone https://github.com/hupi11/flood-water-segmentation.git
+cd flood-water-segmentation
+
+conda create -n flood-water-segmentation python=3.8
+conda activate flood-water-segmentation
+
+pip install -r requirements.txt
 ```
 
-Download the SAM checkpoint (`sam_vit_h_4b8939.pth`) from the [SAM official repository](https://github.com/facebookresearch/segment-anything).
+### SAM Checkpoint
+
+Download the SAM ViT-H checkpoint and place it in the project root:
+
+```bash
+wget https://dl.fbaipublicfiles.com/segment_anything/sam_vit_h_4b8939.pth
+```
+
+Or manually download from: [https://github.com/facebookresearch/segment-anything#model-checkpoints](https://github.com/facebookresearch/segment-anything#model-checkpoints)
+
+The checkpoint file should be placed at the project root:
+
+```
+flood-water-segmentation/
+├── sam_vit_h_4b8939.pth   ← place here
+├── persam_kmeans.py
+└── ...
+```
 
 ## Repository Structure
 
 ```
-MyCode/
+flood-water-segmentation/
 ├── persam_kmeans.py                  # Main algorithm
 ├── show.py                           # Visualization utilities
 ├── per_segment_anything/             # Modified SAM framework (based on PerSAM)
@@ -90,15 +117,15 @@ The core segmentation script. Key modifications over the original PerSAM:
 ```bash
 # Run on all images in a dataset
 python persam_kmeans.py \
-    --data ./flood_data/camera01/01 \
+    --data ./flood_data/Tewkesbury \
     --outdir results \
     --ref_idx 000 \
     --num_point 6
 
 # Run on a single image
 python persam_kmeans.py \
-    --data ./flood_data/camera01/01 \
-    --one_data ./flood_data/camera01/01/Images/water/005.jpg \
+    --data ./flood_data/Tewkesbury \
+    --one_data ./flood_data/Tewkesbury/Images/water/005.jpg \
     --outdir results \
     --ref_idx 000 \
     --num_point 6
@@ -126,16 +153,7 @@ flood_data/
 
 ## Modified SAM Framework — `per_segment_anything/`
 
-Based on the original [PerSAM](https://github.com/ZrrSkywalker/Personalize-SAM) framework, with the following modifications:
-
-| File | Description |
-|------|-------------|
-| `predictor.py` | Extended `SamPredictor.predict()` to accept `attn_sim` (target-guided attention map) and `target_embedding` (semantic prompt) as additional inputs |
-| `modeling/sam.py` | Modified SAM forward pass to inject `attn_sim` into cross-attention layers |
-| `modeling/mask_decoder.py` | Modified mask decoder to incorporate target-semantic prompting |
-| `build_sam.py` | Model factory for ViT-H and MobileSAM (ViT-T) |
-| `modeling/image_encoder.py` | ViT-based image encoder |
-| `modeling/prompt_encoder.py` | Point, box and mask prompt encoder |
+The `per_segment_anything/` module is adapted from the [PerSAM](https://github.com/ZrrSkywalker/Personalize-SAM) framework (Zhang et al., 2023). We modified `predictor.py` and `modeling/` to support additional inputs (`attn_sim` and `target_embedding`) required by our method. For full details of the original architecture, please refer to the [PerSAM repository](https://github.com/ZrrSkywalker/Personalize-SAM).
 
 ---
 
