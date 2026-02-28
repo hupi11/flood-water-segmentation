@@ -8,7 +8,7 @@ This repository contains the code for our paper. The method builds upon [PerSAM]
 
 The dataset used in this work is publicly available on Zenodo:
 
-> **Download:** [https://zenodo.org/](https://zenodo.org/) — `dataset.zip` (316.30 MB, MD5: `2c0b02412e99521518f8624c1f77a929`)
+> **Download:** [https://doi.org/10.5281/zenodo.18758987](https://doi.org/10.5281/zenodo.18758987) — `dataset.zip` (316.30 MB, MD5: `2c0b02412e99521518f8624c1f77a929`)
 
 The dataset contains four flood monitoring sites: **Tewkesbury**, **DiglisLock**, **Strensham**, and **Evesham**. Each site includes:
 
@@ -88,15 +88,9 @@ flood-water-segmentation/
 │   ├── build_sam.py                  # SAM model builder
 │   ├── modeling/                     # SAM model components
 │   └── utils/                        # Preprocessing utilities
-├── evaluation/                       # Evaluation scripts
-│   ├── miou_verife.py
-│   ├── miou_verife_iou.py
-│   ├── miou_ANOVA.py
-│   ├── eval_miou.py
-│   ├── persam_coords_verify.py
-│   └── batch_run_persam_coords.py
-└── regression_data/
-    └── caculate.py                   # Water area ratio calculation
+├── evaluation/
+│   └── evaluate.py                   # IoU & Accuracy evaluation
+└── requirements.txt
 ```
 
 ---
@@ -159,57 +153,16 @@ The `per_segment_anything/` module is adapted from the [PerSAM](https://github.c
 
 ## Evaluation
 
-### `evaluation/miou_verife.py` / `miou_verife_iou.py`
+### `evaluation/evaluate.py`
 
-Compute IoU and pixel Accuracy by comparing predicted masks against ground-truth annotations. Results are grouped by reference image index.
-
-```bash
-python evaluation/miou_verife.py \
-    --pred_path <output_dir_prefix> \
-    --gt_path ./flood_data/<dataset>/Annotations \
-    --ref_idx <ref_frame_index>
-```
-
-### `evaluation/eval_miou.py`
-
-Evaluate segmentation IoU for a single prediction directory. Useful for quick per-run assessment.
+Compute IoU and pixel Accuracy by comparing predicted masks against ground-truth annotations.
 
 ```bash
-python evaluation/eval_miou.py \
+python evaluation/evaluate.py \
     --pred_path <output_dir> \
     --gt_path ./flood_data/<dataset>/Annotations \
     --ref_idx <ref_frame_index>
 ```
-
-### `evaluation/miou_ANOVA.py`
-
-Perform Kruskal-Wallis test and Dunn's post-hoc test (Bonferroni correction) to assess whether the number of prompt points significantly affects segmentation IoU.
-
-```bash
-python evaluation/miou_ANOVA.py \
-    --pred_path <output_dir_prefix_list> \
-    --gt_path ./flood_data/<dataset>/Annotations \
-    --ref_idx <ref_idx_list>
-```
-
-### `evaluation/persam_coords_verify.py` / `batch_run_persam_coords.py`
-
-Verify the quality and distribution of selected prompt coordinates across datasets. `batch_run_persam_coords.py` automates running the verification across multiple datasets and reference frames.
-
----
-
-## Water Area Ratio Calculation
-
-### `regression_data/caculate.py`
-
-Calculate the water body area ratio (water pixels / total pixels) from segmentation mask PNG files. Used to generate the water ratio feature for regression-based water level estimation.
-
-```bash
-# Edit directory_path inside the script before running
-python regression_data/caculate.py
-```
-
-Output: a CSV file with columns `image_name` and `water_ratio`.
 
 ---
 
